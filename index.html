@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Girou! · Roleta de sorteios</title>
+<meta name="description" content="Crie roletas personalizadas para sortear nomes, números, perguntas e grupos. Rápido, bonito e guarda tudo no seu perfil.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23E8B85C%22/><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22none%22 stroke=%22%23141225%22 stroke-width=%226%22/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- Decorative ambient background -->
+<div class="ambient" aria-hidden="true"></div>
+
+<!-- ============ AUTH SCREEN ============ -->
+<section id="screen-auth" class="screen screen-auth">
+  <div class="auth-wrap">
+    <div class="auth-showcase">
+      <div class="brand">
+        <span class="brand-pin"></span>
+        <span class="brand-name">Girou<span class="brand-dot">!</span></span>
+      </div>
+      <h1 class="auth-headline">A sorte fica<br>mais bonita<br>quando gira.</h1>
+      <p class="auth-sub">Monte roletas para sortear nomes, grupos, perguntas, números — o que precisar. Cada perfil guarda as próprias roletas, prontas pra girar de novo quando quiser.</p>
+      <div class="mini-wheel" id="miniWheel" aria-hidden="true">
+        <svg viewBox="0 0 200 200" class="mini-wheel-svg">
+          <g id="miniWheelSegments"></g>
+          <circle cx="100" cy="100" r="14" class="mini-wheel-hub"/>
+        </svg>
+        <div class="mini-wheel-pin"></div>
+      </div>
+    </div>
+
+    <div class="auth-card">
+      <div class="ticket-notch ticket-notch-top" aria-hidden="true"></div>
+
+      <div class="auth-tabs" role="tablist">
+        <button class="auth-tab is-active" data-tab="login" role="tab" aria-selected="true">Entrar</button>
+        <button class="auth-tab" data-tab="register" role="tab" aria-selected="false">Criar perfil</button>
+      </div>
+
+      <form id="loginForm" class="auth-form" autocomplete="on">
+        <label class="field">
+          <span class="field-label">Usuário</span>
+          <input type="text" name="username" id="loginUsername" placeholder="seu.usuario" autocomplete="username" required>
+        </label>
+        <label class="field">
+          <span class="field-label">Senha</span>
+          <input type="password" name="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+        </label>
+        <p class="field-error" id="loginError" role="alert"></p>
+        <button type="submit" class="btn btn-primary btn-block">Entrar e ver minhas roletas</button>
+      </form>
+
+      <form id="registerForm" class="auth-form is-hidden" autocomplete="off">
+        <label class="field">
+          <span class="field-label">Como podemos te chamar</span>
+          <input type="text" name="displayName" id="regDisplayName" placeholder="Ex: Marina" required>
+        </label>
+        <label class="field">
+          <span class="field-label">Escolha um usuário</span>
+          <input type="text" name="username" id="regUsername" placeholder="sem espaços" required>
+        </label>
+        <label class="field">
+          <span class="field-label">Crie uma senha</span>
+          <input type="password" name="password" id="regPassword" placeholder="mínimo 4 caracteres" required>
+        </label>
+        <p class="field-error" id="registerError" role="alert"></p>
+        <button type="submit" class="btn btn-primary btn-block">Criar meu perfil</button>
+      </form>
+
+      <p class="auth-note">Seus dados ficam salvos só neste navegador — é um jeito simples de separar as roletas de cada pessoa, não um sistema de contas com senha protegida por servidor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DASHBOARD ============ -->
+<section id="screen-dashboard" class="screen is-hidden">
+  <header class="topbar">
+    <div class="brand brand-sm">
+      <span class="brand-pin"></span>
+      <span class="brand-name">Girou<span class="brand-dot">!</span></span>
+    </div>
+    <div class="topbar-right">
+      <span class="hello-user">Olá, <strong id="dashUserName"></strong></span>
+      <button class="btn btn-ghost" id="logoutBtn">Sair</button>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="dashboard-headline">
+      <h2>Suas roletas</h2>
+      <p id="dashSubtitle" class="muted"></p>
+    </div>
+
+    <div class="wheel-grid" id="wheelGrid">
+      <!-- Cards injected by JS -->
+    </div>
+  </main>
+</section>
+
+<!-- ============ EDITOR ============ -->
+<section id="screen-editor" class="screen is-hidden">
+  <header class="topbar">
+    <button class="btn btn-ghost btn-back" id="editorBackBtn">← Painel</button>
+    <div class="topbar-right">
+      <span class="hello-user" id="editorHeading">Nova roleta</span>
+    </div>
+  </header>
+
+  <main class="editor-main">
+    <div class="editor-col editor-col-form">
+      <label class="field field-title">
+        <span class="field-label">Título da roleta</span>
+        <input type="text" id="wheelTitleInput" placeholder="Ex: Quem apresenta hoje?" maxlength="60">
+      </label>
+
+      <div class="presets">
+        <span class="presets-label">Preencher rápido:</span>
+        <button class="chip" data-preset="simnao">Sim / Não</button>
+        <button class="chip" data-preset="numeros10">Números 1–10</button>
+        <button class="chip" data-preset="numeros20">Números 1–20</button>
+        <button class="chip" data-preset="dias">Dias da semana</button>
+        <button class="chip" data-preset="grupos">Grupos A–D</button>
+      </div>
+
+      <div class="bulk-add">
+        <label class="field">
+          <span class="field-label">Adicionar em lote (um item por linha)</span>
+          <textarea id="bulkTextarea" rows="3" placeholder="Ana&#10;Bruno&#10;Carla"></textarea>
+        </label>
+        <button class="btn btn-secondary" id="bulkAddBtn" type="button">Adicionar itens</button>
+      </div>
+
+      <div class="items-header">
+        <span class="field-label">Itens da roleta</span>
+        <span class="items-count" id="itemsCount">0 itens</span>
+      </div>
+      <ul class="items-list" id="itemsList"></ul>
+
+      <div class="add-item-row">
+        <input type="text" id="newItemInput" placeholder="Digite um item e aperte Enter">
+        <button class="btn btn-secondary" id="addItemBtn" type="button">Adicionar</button>
+      </div>
+
+      <p class="field-error" id="editorError" role="alert"></p>
+
+      <div class="editor-actions">
+        <button class="btn btn-ghost" id="deleteWheelBtn">Excluir roleta</button>
+        <div class="editor-actions-right">
+          <button class="btn btn-secondary" id="saveWheelBtn">Salvar</button>
+          <button class="btn btn-primary" id="saveAndSpinBtn">Salvar e girar →</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-col editor-col-preview">
+      <span class="field-label">Prévia</span>
+      <div class="preview-wheel-wrap">
+        <svg viewBox="0 0 200 200" class="preview-wheel-svg" id="previewWheelSvg">
+          <g id="previewWheelSegments"></g>
+          <circle cx="100" cy="100" r="16" class="mini-wheel-hub"/>
+        </svg>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ============ SPIN SCREEN ============ -->
+<section id="screen-spin" class="screen is-hidden">
+  <header class="topbar">
+    <button class="btn btn-ghost btn-back" id="spinBackBtn">← Painel</button>
+    <div class="topbar-right">
+      <button class="btn btn-ghost" id="editWheelFromSpinBtn">Editar itens</button>
+    </div>
+  </header>
+
+  <main class="spin-main">
+    <h2 class="spin-title" id="spinWheelTitle"></h2>
+
+    <div class="wheel-stage">
+      <div class="wheel-pointer" aria-hidden="true"></div>
+      <div class="wheel-canvas-wrap" id="wheelCanvasWrap">
+        <svg viewBox="0 0 400 400" class="wheel-svg" id="wheelSvg">
+          <g id="wheelSegments"></g>
+        </svg>
+        <button class="wheel-hub" id="wheelHubBtn" aria-label="Girar roleta"></button>
+      </div>
+    </div>
+
+    <div class="spin-controls">
+      <button class="btn btn-primary btn-spin" id="spinBtn">Girar roleta</button>
+      <p class="spin-hint">clique na roleta, no botão, ou aperte <kbd>espaço</kbd></p>
+    </div>
+
+    <div class="history-panel" id="historyPanel">
+      <div class="history-head">
+        <span class="field-label">Histórico de sorteios</span>
+        <button class="chip chip-ghost" id="clearHistoryBtn">Limpar</button>
+      </div>
+      <ol class="history-list" id="historyList"></ol>
+    </div>
+  </main>
+
+  <!-- Result overlay -->
+  <div class="result-overlay is-hidden" id="resultOverlay">
+    <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+    <div class="result-card">
+      <div class="ticket-notch ticket-notch-top" aria-hidden="true"></div>
+      <span class="result-eyebrow">Deu essa!</span>
+      <h3 class="result-value" id="resultValue"></h3>
+      <div class="result-actions">
+        <button class="btn btn-primary" id="spinAgainBtn">Girar novamente</button>
+        <button class="btn btn-secondary" id="removeAndSpinBtn">Remover e girar</button>
+        <button class="btn btn-ghost" id="closeResultBtn">Fechar</button>
+      </div>
+      <div class="ticket-notch ticket-notch-bottom" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
