@@ -2,34 +2,7 @@
 
 App web para criar roletas personalizadas (nomes, grupos, perguntas, números, o que precisar), com perfis de usuário, roletas salvas por perfil, física de giro com som e uma tela de resultado com confete. Não usa nenhum framework nem processo de build — é HTML, CSS e JavaScript puros, então roda direto no GitHub Pages.
 
-## Estrutura
 
-```
-roleta-app/
-├── index.html
-├── css/
-│   └── styles.css
-└── js/
-    └── app.js
-```
-
-## Como publicar no GitHub Pages
-
-1. Crie um repositório novo no GitHub (ex: `roleta`).
-2. Suba os arquivos desta pasta para a raiz do repositório (pode arrastar e soltar pela interface do GitHub, ou via git):
-   ```
-   git init
-   git add .
-   git commit -m "Girou! primeira versão"
-   git branch -M main
-   git remote add origin https://github.com/SEU-USUARIO/roleta.git
-   git push -u origin main
-   ```
-3. No repositório, vá em **Settings → Pages**.
-4. Em **Source**, selecione a branch `main` e a pasta `/ (root)`.
-5. Salve. Em alguns minutos o site estará em `https://SEU-USUARIO.github.io/roleta/`.
-
-Não é preciso configurar nada além disso — não há backend, banco de dados ou variáveis de ambiente.
 
 ## Como funciona o login
 
@@ -38,16 +11,6 @@ Não existe servidor: cada perfil (usuário, senha com hash e nome de exibição
 Consequências práticas:
 - Um perfil criado no navegador do computador do trabalho não aparece no celular — os dados não sincronizam entre aparelhos.
 - Limpar os dados do site no navegador (ou usar aba anônima) apaga os perfis e roletas salvos ali.
-
-## Testando localmente
-
-O recurso de hash de senha usa `crypto.subtle`, que exige um "contexto seguro" — ou seja, **não funciona abrindo o `index.html` direto com duplo clique** (protocolo `file://`). Para testar localmente, sirva a pasta com um servidor simples, por exemplo:
-
-```
-python3 -m http.server 8000
-```
-
-e acesse `http://localhost:8000`. No GitHub Pages (https) isso já funciona normalmente, sem nenhum passo extra.
 
 ## Funcionalidades
 
